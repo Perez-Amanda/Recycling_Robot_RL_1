@@ -70,7 +70,7 @@ Lorem ipsum
 
 ## Resultados e discussão
 
-Para explorar a influência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e rodamos os jogos com diferentes valores de $\epsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
+Para explorar a influência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e os parâmetros do ambiente ($\alpha$ e $\beta$) e rodamos os jogos com diferentes valores de $\epsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
 
 
 
@@ -78,19 +78,24 @@ Para explorar a influência dos hiperparâmetros no aprendizado de cada método,
 
 - TD(0)
 
+Primeiramente, utilizando o método TD(0), fixamos $\gamma = 0.9$ e tomamos $\varepsilon \in \{0.0, \ 0.1, \ 0.5\}$.
+
+Em todos os cenários, a política ótima aprendida ao fim do treinamento opta por procurar sempre que a bateria está alta e recarregar sempre que a bateria está baixa, não havendo grande diferença entre os *heatmaps*. Entretanto, a evolução dos *rewards* ao longo das épocas apresenta diferenças. 
+
 <p float="left">
-  <img src="/figs/rewards_epsilon0p1_td0.png" width="500" />
-  <img src="/figs/heatmap_epsilon0p1_td0.png" width="500" />
+  <img src="/figs/rewards_epsilon0p1_td0.png" width="400" />
+  <img src="/figs/heatmap_epsilon0p1_td0.png" width="400" />
+</p>
+
+
+<p float="left">
+  <img src="/figs/rewards_epsilon0p5_td0.png" width="400" />
+  <img src="/figs/heatmap_epsilon0p5_td0.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_epsilon0p5_td0.png" width="500" />
-  <img src="/figs/heatmap_epsilon0p5_td0.png" width="500" />
-</p>
-
-<p float="left">
-  <img src="/figs/rewards_greddy_td0.png" width="500" />
-  <img src="/figs/heatmap_greedy_td0.png" width="500" />
+  <img src="/figs/rewards_greddy_td0.png" width="400" />
+  <img src="/figs/heatmap_greedy_td0.png" width="400" />
 </p>
 
 <!-- ![FIGURA KAPUTT](figs/rewards_epsilon0p1_td0.png)
@@ -109,18 +114,18 @@ Para explorar a influência dos hiperparâmetros no aprendizado de cada método,
 - Q-Learning
 
 <p float="left">
-  <img src="/figs/rewards_epsilon0p1_q.png" width="500" />
-  <img src="/figs/heatmap_epsilon0p1_q.png" width="500" />
+  <img src="/figs/rewards_epsilon0p1_q.png" width="400" />
+  <img src="/figs/heatmap_epsilon0p1_q.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_epsilon0p5_q.png" width="500" />
-  <img src="/figs/heatmap_epsilon0p5_q.png" width="500" />
+  <img src="/figs/rewards_epsilon0p5_q.png" width="400" />
+  <img src="/figs/heatmap_epsilon0p5_q.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_greedy_q.png" width="500" />
-  <img src="/figs/heatmap_greedy_q.png" width="500" />
+  <img src="/figs/rewards_greedy_q.png" width="400" />
+  <img src="/figs/heatmap_greedy_q.png" width="400" />
 </p>
 
 <!-- ![FIGURA KAPUTT](figs/rewards_epsilon0p1_q.png)
@@ -150,18 +155,18 @@ Para explorar a influência dos hiperparâmetros no aprendizado de cada método,
 - TD(0)
 
 <p float="left">
-  <img src="/figs/rewards_gamma0p5_td0.png" width="500" />
-  <img src="/figs/heatmap_gamma0p5_td0.png" width="500" />
+  <img src="/figs/rewards_gamma0p5_td0.png" width="400" />
+  <img src="/figs/heatmap_gamma0p5_td0.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_gamma0p8_td0.png" width="500" />
-  <img src="/figs/heatmap_gamma0p8_td0.png" width="500" />
+  <img src="/figs/rewards_gamma0p8_td0.png" width="400" />
+  <img src="/figs/heatmap_gamma0p8_td0.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_gamma0p9_td0.png" width="500" />
-  <img src="/figs/heatmap_gamma0p9_td0.png" width="500" />
+  <img src="/figs/rewards_gamma0p9_td0.png" width="400" />
+  <img src="/figs/heatmap_gamma0p9_td0.png" width="400" />
 </p>
 
 
@@ -180,18 +185,18 @@ Para explorar a influência dos hiperparâmetros no aprendizado de cada método,
 - Q-Learning
 
 <p float="left">
-  <img src="/figs/rewards_gamma0p5_q.png" width="500" />
-  <img src="/figs/heatmap_gamma0p5_q.png" width="500" />
+  <img src="/figs/rewards_gamma0p5_q.png" width="400" />
+  <img src="/figs/heatmap_gamma0p5_q.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_gamma0p8_q.png" width="500" />
-  <img src="/figs/heatmap_gamma0p8_q.png" width="500" />
+  <img src="/figs/rewards_gamma0p8_q.png" width="400" />
+  <img src="/figs/heatmap_gamma0p8_q.png" width="400" />
 </p>
 
 <p float="left">
-  <img src="/figs/rewards_gamma0p9_q.png" width="500" />
-  <img src="/figs/heatmap_gamma0p9_q.png" width="500" />
+  <img src="/figs/rewards_gamma0p9_q.png" width="400" />
+  <img src="/figs/heatmap_gamma0p9_q.png" width="400" />
 </p>
 
 <!-- ![FIGURA KAPUTT](figs/rewards_gamma0p5_q.png)
