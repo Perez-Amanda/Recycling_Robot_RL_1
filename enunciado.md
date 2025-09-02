@@ -1,3 +1,5 @@
+# Enunciado
+
 Na página 52 do Livro-texto, encontra-se a descrição do problema do Robô de reciclagem (Exemplo 3.3). Sigam a descrição do problema e escolhas valores para as probabilidades $\alpha$ e $\beta$, e as recompensas $r_{search}$ e $r_{wait}$, respeitando as pecificação de $r_{search} > r_{wait}$.
 
 Empregue o algoritmo de Temporal difference (TD), usado no problema do jogo da Velha, para o aprendizado do Robô de reciclagem. O Robô deve aprender a maximizar a recompensa total, que é a soma das recompensas obtidas em cada passo do processo de decisão.
