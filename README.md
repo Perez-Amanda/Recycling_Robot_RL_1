@@ -1,2 +1,12 @@
 # Recycling Robot - Reinforcement Learning Project 1
-Repository created for implementing a RL algorithm for a recycling robot, as Project 1 of the Reinforcement Learning course at FGV EMAp.
+## Amanda Perez & Lucas Westfal
+
+Repositório criado para implementar um algoritmo de aprendizado por reforço para um robô de reciclagem, como projeto 1 do curso de Aprendizado por Reforço da FGV EMAp.
+
+*Ambos os participantes dessa tarefa trabalharam equivalentemente no desenvolvimento do projeto, majoritariamente por meio de programação em par.*
+
+-----
+
+
+
+
