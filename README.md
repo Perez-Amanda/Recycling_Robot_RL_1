@@ -19,9 +19,9 @@ Este trabalho apresenta a implementação e análise de algoritmos de aprendizad
 
 Consideramos um robô de reciclagem, conforme apresentado no Exemplo 3.3 (página  52) de [1]. O robô que deve coletar latas para reciclagem. Seu funcionamento depende de uma bateria, que pode estar alta ou baixa, e o robô pode escolher entre andar pelo ambiente em busca de latas, ficar parado esperando que alguém o entregue alguma lata ou ir recarregar. Dessa forma, o espaço de estados $\mathcal{X}$ descreve os níveis da bateria e é dado por:
 
-$$\mathcal{X} = \{ \textrm{alta}, \textrm{baixa} \},$$
+$$\mathcal{X} = \lbrace \textrm{alta}, \textrm{baixa} \rbrace,$$
 enquanto o espaço de ações é:
-$$\mathcal{A} = \{ \textrm{procurar}, \textrm{esperar}, \textrm{recarregar} \}$$
+$$\mathcal{A} = \lbrace \textrm{procurar}, \textrm{esperar}, \textrm{recarregar} \rbrace$$
 
 Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. Nota-se que esse é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares.
 
