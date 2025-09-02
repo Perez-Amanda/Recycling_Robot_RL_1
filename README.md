@@ -19,9 +19,9 @@ Este trabalho apresenta a implementação e análise de algoritmos de aprendizad
 
 Consideramos um robô de reciclagem, conforme apresentado no Exemplo 3.3 (página  52) de [1]. O robô que deve coletar latas para reciclagem. Seu funcionamento depende de uma bateria, que pode estar alta ou baixa, e o robô pode escolher entre andar pelo ambiente em busca de latas, ficar parado esperando que alguém o entregue alguma lata ou ir recarregar. Dessa forma, o espaço de estados $\mathcal{X}$ descreve os níveis da bateria e é dado por:
 
-$$\mathcal{X} = \{ \textrm{alta}, \textrm{baixa} \},$$
+$$\mathcal{X} = \lbrace \textrm{alta}, \textrm{baixa} \rbrace,$$
 enquanto o espaço de ações é:
-$$\mathcal{A} = \{ \textrm{procurar}, \textrm{esperar}, \textrm{recarregar} \}$$
+$$\mathcal{A} = \lbrace \textrm{procurar}, \textrm{esperar}, \textrm{recarregar} \rbrace$$
 
 Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. Nota-se que esse é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares.
 
@@ -171,7 +171,7 @@ Para explorar a influência dos hiperparâmetros no aprendizado de cada método,
 
 - TD(0)
 
-Primeiramente, utilizando o método TD(0), fixamos $\gamma = 0.9$ e tomamos $\varepsilon \in \{0.0, \ 0.1, \ 0.5\}$.
+Primeiramente, utilizando o método TD(0), fixamos $\gamma = 0.9$ e tomamos $\varepsilon \in \lbrace 0.0, \ 0.1, \ 0.5 \rbrace$.
 
 Em todos os cenários, a política ótima aprendida ao fim do treinamento opta por procurar sempre que a bateria está alta e recarregar sempre que a bateria está baixa, não havendo grande diferença entre os *heatmaps*. Entretanto, a evolução dos *rewards* ao longo das épocas apresenta diferenças. 
 
@@ -312,7 +312,7 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 
 ![FIGURA KAPUTT](figs/heatmap_greedy_td0.png)
 -->
-
+<!--
 - Q-Learning
 
 ![FIGURA KAPUTT](figs/rewards_epsilon_greedy_q.png)
@@ -321,7 +321,7 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 
 ![FIGURA KAPUTT](figs/rewards_greedy_q.png)
 
-![FIGURA KAPUTT](figs/heatmap_greedy_q.png)
+![FIGURA KAPUTT](figs/heatmap_greedy_q.png)-->
 
 ## Conclusão
 
@@ -332,6 +332,6 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 
 [1] SUTTON, Richard S.; BARTO, Andrew G. **Reinforcement Learning: An introduction.** 2. ed. Cambridge, MA, USA: The MIT Press, 2018.
 
-[2] CSABA SZEPESVARI. Algorithms for Reinforcement Learning. [s.l.] Morgan & Claypool Publishers, 2010.
+[2] CSABA SZEPESVARI. **Algorithms for Reinforcement Learning.** [s.l.] Morgan & Claypool Publishers, 2010.
 
 ‌
