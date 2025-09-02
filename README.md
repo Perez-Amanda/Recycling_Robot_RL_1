@@ -22,26 +22,128 @@ $$
 \mathcal{A} = \{ \textrm{buscar}, \textrm{esperar}, \textrm{recarregar} \}
 $$
 
-Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. Nota-se que esse é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares. Seguindo o solicitado pelo enunciado, [falar sobre usar TD e a escolha de usar Q-learning]
+Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. Nota-se que esse é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares.
 
+## Soluções
+
+Usando *temporal difference learning*, o problema pode ser resolvido equivalentemente por diferentes métodos capazes de estimar a política ótima; usamos TD(0) e Q-Learning.
+
+### TD(0)
+
+O TD(0) por si só apenas é um algoritmo de avaliação. Ele nos dá o valor de estar em um estado $s$ sob uma política específica $\pi$, $V(s)$.
+
+Atualizamos TD(0) por:
+
+$$ V(s) \leftarrow V(s) + \alpha \left[ R + \gamma V(s') - V(s) \right] $$
+
+Como a atualização depende do valor do próximo estado, $V(s')$, que foi obtido por seguir a política $\pi$, o método não procura politica ótima mas sim avalia a qualidade da política atual - se fazendo necessário método adicional para evoluir as políticas. 
+
+O código para aprender *tic-tac-toe*, disponibilizado para resolver esse problema, adota essa metodologia.
+
+### Q-Learning
+
+Em contraste, o *Q-learning* aprende diretamente o valor de tomar ação $a$ em um estado $s$, $Q(s, a)$. Com ele podemos encontrar política ótima $\pi^*$ durante jogo, dado o conhecimento acumulado do jogo.
+
+A atualização da função $Q$ é feita pela seguinte equação:
+
+$$ Q(s, a) \leftarrow Q(s, a) + \alpha \left[ R + \gamma \max_{a'} Q(s', a') - Q(s, a) \right] $$
+
+Onde com $\max_{a'} Q(s', a')$ encontramos ação $a'$ que maximiza a função $Q$ depois de tomada ação $a$. É atualizado o valor da ação atual $(s, a)$ assumindo que a melhor ação possível será tomada no próximo estado $(s')$, independentemente da ação que a política de exploração realmente escolheu. Isso o torna um método off-policy, pois aprende sobre a política ótima (gananciosa) enquanto segue outra política (por exemplo, epsilon-greedy)
 
 ## Implementação
 
 O código implementado encontra-se disponível no arquivo `main.ipynb`. Acompanhando o código, estão alguns comentários para complementar e melhorar a legibilidade. 
 
 Buscando seguir uma estrutura parecida com a do exemplo do jogo da velha, foram definidas as classes:
-- `Enviroment`: ...
-- `Agent`: ...
+- `Enviroment`: Lorem ipsum
+- `Agent`: Lorem ipsum
+
+### TD(0)
+
+Loren ipsum
+
+### Q-Learning
+
+Lorem ipsum
 
 
 
 ## Resultados e discussão
 
+Para explorar a unfluência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e rodamos os jogos com diferentes valores de $\epsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
 
+
+
+### Explorando $\epsilon$
+
+- TD(0)
+
+![FIGURA KAPUTT](figs/rewards_epsilon0p1_td0.png)
+
+![FIGURA KAPUTT](figs/heatmap_epsilon0p1_td0.png)
+
+![FIGURA KAPUTT](figs/rewards_epsilon0.5_td0.png)
+
+![FIGURA KAPUTT](figs/heatmap_epsilon0.5_td0.png)
+
+
+- Q-Learning
+
+![FIGURA KAPUTT](figs/rewards_epsilon_greedy_q.png)
+
+![FIGURA KAPUTT](figs/heatmap_epsilon_greedy_q.png)
+
+
+![FIGURA KAPUTT](figs/rewards_greedy_q.png)
+
+![FIGURA KAPUTT](figs/heatmap_greedy_q.png)
+
+### Explorando $\gamma$
+
+- TD(0)
+
+![FIGURA KAPUTT](figs/rewards_gamma0p5_td0.png)
+
+![FIGURA KAPUTT](figs/heatmap_gamma0p5_td0.png)
+
+![FIGURA KAPUTT](figs/rewards_gamma0p9_td0.png)
+
+![FIGURA KAPUTT](figs/heatmap_gamma0p9_td0.png)
+
+- Q-Learning
+
+![FIGURA KAPUTT](figs/rewards_gamma0p5_q.png)
+
+![FIGURA KAPUTT](figs/heatmap_gamma0p5_q.png)
+
+
+![FIGURA KAPUTT](figs/rewards_gamma0p9_q.png)
+
+![FIGURA KAPUTT](figs/heatmap_gamma0p9_q.png)
+
+### Comparando greedy e $\epsilon$-greedy
+
+![FIGURA KAPUTT](figs/rewards_epsilon_greedy_td0.png)
+
+![FIGURA KAPUTT](figs/heatmap_epsilon_greedy_td0.png)
+
+![FIGURA KAPUTT](figs/heatmap_greedy_td0.png)
+
+- Q-Learning
+
+![FIGURA KAPUTT](figs/rewards_epsilon_greedy_q.png)
+
+![FIGURA KAPUTT](figs/heatmap_epsilon_greedy_q.png)
+
+![FIGURA KAPUTT](figs/rewards_greedy_q.png)
+
+![FIGURA KAPUTT](figs/heatmap_greedy_q.png)
 
 ---
 ## Referências
 
 [1] SUTTON, Richard S.; BARTO, Andrew G. **Reinforcement Learning: An introduction.** 2. ed. Cambridge, MA, USA: The MIT Press, 2018.
 
-[2]
+[2] CSABA SZEPESVARI. Algorithms for Reinforcement Learning. [s.l.] Morgan & Claypool Publishers, 2010.
+
+‌
