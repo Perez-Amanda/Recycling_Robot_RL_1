@@ -13,38 +13,21 @@ A seguir, neste mesmo documento, apresentamos o relatório do projeto, com a des
 
 ## Introdução
 
-Este trabalho apresenta a implementação e análise de algoritmos de aprendizado por reforço para solucionar o problema do robô de reciclagem, conforme descrito por Sutton & Barto. Foram implementados dois métodos de aprendizado por diferença temporal (TD): TD(0) para avaliação de política e Q-Learning para a busca direta da política ótima. O estudo explora a influência de hiperparâmetros, como a taxa de exploração ($\epsilon$) e o *discount factor* ($\gamma$), no comportamento e na convergência do agente. Os resultados demonstram a importância da exploração (política $\epsilon$-greedy) para a descoberta da política ótima em comparação com uma abordagem puramente greedy, além de evidenciarem como o fator de desconto molda a estratégia do agente entre recompensas imediatas e ganhos a longo prazo.
-
-## Objetivos
-
-objetivo principal deste projeto é aplicar e analisar algoritmos de aprendizado por reforço em um ambiente de decisão de Markov finito. Os objetivos específicos são:
-
-- Implementar um ambiente simulado para o problema do robô de reciclagem, definindo seus estados, ações, recompensas e probabilidades de transição.
-
-- Desenvolver agentes capazes de aprender uma política de decisão utilizando os algoritmos TD(0) e Q-Learning.
-
-- Analisar o impacto da taxa de exploração ($\epsilon$), comparando o desempenho e a política final de um agente com estratégia $epsilon$-greedy contra um agente puramente greedy.
-
-- Investigar a influência do fator de desconto (γ) na política ótima aprendida, avaliando como o agente pondera recompensas futuras.
-
-- Visualizar e interpretar as curvas de aprendizado (recompensa por época) e as políticas ótimas resultantes por meio de mapas de calor.
+Este trabalho apresenta a implementação e análise de algoritmos de aprendizado por reforço para solucionar o problema do robô de reciclagem, conforme descrito por Sutton & Barto. Foram implementados dois métodos de aprendizado por diferença temporal (TD): TD(0) para avaliação de política e Q-Learning para a busca direta da política ótima. O estudo explora a influência de hiperparâmetros, como a taxa de exploração ($\epsilon$) e o *discount factor* ($\gamma$), no comportamento e na convergência do agente. Os resultados demonstram a importância da exploração (política $\epsilon$-greedy) para a descoberta da política ótima em comparação com uma abordagem puramente greedy, além de evidenciarem como o fator de desconto molda a estratégia do agente entre recompensas imediatas e ganhos a longo prazo, por meio de curvas de aprendizado (recompensa por época) e as políticas ótimas resultantes por meio de mapas de calor.
 
 ## Descrição do problema
 
 Consideramos um robô de reciclagem, conforme apresentado no Exemplo 3.3 (página  52) de [1]. O robô que deve coletar latas para reciclagem. Seu funcionamento depende de uma bateria, que pode estar alta ou baixa, e o robô pode escolher entre andar pelo ambiente em busca de latas, ficar parado esperando que alguém o entregue alguma lata ou ir recarregar. Dessa forma, o espaço de estados $\mathcal{X}$ descreve os níveis da bateria e é dado por:
-$$
-\mathcal{X} = \{ \textrm{alta}, \textrm{baixa} \},
-$$
+
+$$\mathcal{X} = \{ \textrm{alta}, \textrm{baixa} \},$$
 enquanto o espaço de ações é:
-$$
-\mathcal{A} = \{ \textrm{buscar}, \textrm{esperar}, \textrm{recarregar} \}
-$$
+$$\mathcal{A} = \{ \textrm{procurar}, \textrm{esperar}, \textrm{recarregar} \}$$
 
 Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. Nota-se que esse é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares.
 
 ## Soluções
 
-Usando *temporal difference learning*, o problema pode ser resolvido equivalentemente por diferentes métodos capazes de estimar a política ótima; usamos TD(0) e Q-Learning.
+Usando *temporal difference learning*, o problema pode ser resolvido equivalentemente por diferentes métodos capazes de estimar a política ótima; usamos TD(0) (mais método de atualização de política) e Q-Learning.
 
 ### TD(0)
 
@@ -56,7 +39,7 @@ $$ V(s) \leftarrow V(s) + \alpha \left[ R + \gamma V(s') - V(s) \right] $$
 
 Como a atualização depende do valor do próximo estado, $V(s')$, que foi obtido por seguir a política $\pi$, o método não procura politica ótima mas sim avalia a qualidade da política atual - se fazendo necessário método adicional para evoluir as políticas. 
 
-O código para aprender *tic-tac-toe*, disponibilizado para resolver esse problema, adota essa metodologia.
+O código para aprender *tic-tac-toe*, adaptado para resolver esse problema, adota essa metodologia.
 
 ### Q-Learning
 
@@ -66,7 +49,7 @@ A atualização da função $Q$ é feita pela seguinte equação:
 
 $$ Q(s, a) \leftarrow Q(s, a) + \alpha \left[ R + \gamma \max_{a'} Q(s', a') - Q(s, a) \right] $$
 
-Onde com $\max_{a'} Q(s', a')$ encontramos ação $a'$ que maximiza a função $Q$ depois de tomada ação $a$. É atualizado o valor da ação atual $(s, a)$ assumindo que a melhor ação possível será tomada no próximo estado $(s')$, independentemente da ação que a política de exploração realmente escolheu. Isso o torna um método off-policy, pois aprende sobre a política ótima (gananciosa) enquanto segue outra política (por exemplo, epsilon-greedy)
+Onde com $\max_{a'} Q(s', a')$ encontramos ação $a'$ que maximiza a função $Q$ depois de tomada ação $a$. É atualizado o valor da ação atual $(s, a)$ assumindo que a melhor ação possível será tomada no próximo estado $(s')$, independentemente da ação que a política de exploração realmente escolheu. Isso o torna um método off-policy, pois aprende sobre a política ótima (greedy) enquanto segue outra política (por exemplo, $\epsilon$-greedy)
 
 ## Implementação
 
@@ -122,7 +105,7 @@ class AgentTD:
 
     def improve_policy(self):
         """
-        PASSO DE MELHORA: Atualiza a política para ser gananciosa em relação aos valores de estado atuais.
+        PASSO DE MELHORA: Atualiza a política para ser greedy em relação aos valores de estado atuais.
         Para cada estado, escolhe a ação que maximiza a recompensa esperada.
         """
         ...
@@ -180,7 +163,7 @@ Funções auxiliares (para gerar imagens e treinar os modelos) também ser encon
 
 ## Resultados e discussão
 
-Para explorar a unfluência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e rodamos os jogos com diferentes valores de $\epsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
+Para explorar a influência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e rodamos os jogos com diferentes valores de $\epsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
 
 
 
