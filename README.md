@@ -13,17 +13,29 @@ A seguir, neste mesmo documento, apresentamos o relatório do projeto, com a des
 
 ## Introdução
 
-Este trabalho apresenta a implementação e análise de algoritmos de aprendizado por reforço para solucionar o problema do robô de reciclagem, conforme descrito por Sutton & Barto. Foram implementados dois métodos de aprendizado por diferença temporal (TD): TD(0) para avaliação de política e Q-Learning para a busca direta da política ótima. O estudo explora a influência de hiperparâmetros, como a taxa de exploração ($\epsilon$) e o *discount factor* ($\gamma$), no comportamento e na convergência do agente. Os resultados demonstram a importância da exploração (política $\epsilon$-greedy) para a descoberta da política ótima em comparação com uma abordagem puramente greedy, além de evidenciarem como o fator de desconto molda a estratégia do agente entre recompensas imediatas e ganhos a longo prazo, por meio de curvas de aprendizado (recompensa por época) e as políticas ótimas resultantes por meio de mapas de calor.
+Este trabalho apresenta a implementação e análise de algoritmos de aprendizado por reforço para solucionar o problema do robô de reciclagem, conforme descrito por Sutton & Barto [1]. Foram implementados dois métodos de aprendizado por diferença temporal (TD): TD(0) para avaliação de política e Q-Learning para a busca direta da política ótima. O estudo explora a influência de hiperparâmetros, como a taxa de exploração ($\epsilon$) e o *discount factor* ($\gamma$), no comportamento e na convergência do agente. Os resultados demonstram a importância da exploração (política $\epsilon$-greedy) para a descoberta da política ótima em comparação com uma abordagem puramente greedy, além de evidenciarem como o fator de desconto molda a estratégia do agente entre recompensas imediatas e ganhos a longo prazo, por meio de curvas de aprendizado (recompensa por época) e as políticas ótimas resultantes por meio de mapas de calor.
 
 ## Descrição do problema
 
-Consideramos um robô de reciclagem, conforme apresentado no Exemplo 3.3 (página  52) de [1]. O robô que deve coletar latas para reciclagem. Seu funcionamento depende de uma bateria, que pode estar alta ou baixa, e o robô pode escolher entre andar pelo ambiente em busca de latas, ficar parado esperando que alguém o entregue alguma lata ou ir recarregar. Dessa forma, o espaço de estados $\mathcal{X}$ descreve os níveis da bateria e é dado por:
+Consideramos um robô de reciclagem, conforme apresentado no Exemplo 3.3 (página  52) de [1], que deve coletar latas em um ambiente. Seu funcionamento depende de uma bateria, que pode estar alta ou baixa, e o robô pode escolher entre andar em busca de latas, ficar parado esperando que alguém o entregue alguma lata ou ir recarregar. Dessa forma, o espaço de estados $\mathcal{X}$ descreve os níveis da bateria e é dado por:
 
 $$\mathcal{X} = \lbrace \textrm{alta}, \textrm{baixa} \rbrace,$$
 enquanto o espaço de ações é:
 $$\mathcal{A} = \lbrace \textrm{procurar}, \textrm{esperar}, \textrm{recarregar} \rbrace$$
 
-Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. Nota-se que esse é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares.
+Quando a bateria está baixa, todas as ações são possíveis. Quando a bateria está alta, não é possível recarregar, apenas buscar ou esperar. O ambiente no qual o agente está inserido é modelado da seguinte forma:
+- o estado da bateria só se altera se o robô estiver procurando;
+- a cada iteração procurando com bateria alta, a probabilidade de a bateria permanecer alta é de $\alpha$;
+- a cada iteração procurando com a bateria baixa, a probabilidade da bateria não acabar é $\beta$;
+- quando a bateria acaba, o robô é resgatado, sua bateria recarregada e o *reward* recebido é $r_{\textrm{rescue}} = -3$;
+- cada lata encontrada fornece $1$ de *reward*;
+- ao procurar, o valor esperado de latas coletadas (e, portanto, do *reward* obtido) é $r_{\textrm{search}}$;
+- ao esperar, o valor esperado de latas coletadas (e, portanto, do *reward* obtido) é $r_{\textrm{wait}}$;
+- nenhuma recompensa é obtida ao recarregar, ou seja, o *reward* é $r_{\textrm{charge}} = 0$.
+
+Para nossa implementação, consideramos $\alpha = 0.9$, $\beta = 0.7$, $r_{\textrm{search}} = 8$ e $r_{\textrm{wait}} = 2$, mas esses valores podem ser facilmente alterados no código.
+
+Nota-se que este é um processo de decisão de Markov finito e com poucas combinações de espaço-ação, o que possibilita o uso de métodos tabulares. Em especial, conforme solicitado na descrição do trabalho, podemos usar métodos de diferenças temporais (*temporal differences*, ou TD). Existem diferentes métodos de RL baseados em TD, mas optamos por implementar dois: TD(0) e Q-Learning. O primeiro foi escolhido por ser o mesmo aplicado no exemplo do jogo da velha, apresentado em aula, enquanto o segundo foi escolhido por incorporar mais informações sobre o contexto e buscar a política ótima de maneira mais direta.
 
 ## Soluções
 
@@ -35,31 +47,35 @@ O TD(0) por si só apenas é um algoritmo de avaliação. Ele nos dá o valor de
 
 Atualizamos TD(0) por:
 
-$$ V(s) \leftarrow V(s) + \alpha \left[ R + \gamma V(s') - V(s) \right] $$
+$$ V(s) \leftarrow V(s) + \eta \left[ R + \gamma V(s') - V(s) \right], $$
+
+onde $\eta$ denota o *learning rate*. Em geral, referências como [1] e [2] utilizam $\alpha$ para representar o *learning rate*, entretanto, para evitar confusão com a probabilidade $\alpha$ de a bateria continuar alta, optamos por utilizar aqui $\eta$.
 
 Como a atualização depende do valor do próximo estado, $V(s')$, que foi obtido por seguir a política $\pi$, o método não procura politica ótima mas sim avalia a qualidade da política atual - se fazendo necessário método adicional para evoluir as políticas. 
 
-O código para aprender *tic-tac-toe*, adaptado para resolver esse problema, adota essa metodologia.
+O código para aprender *tic-tac-toe*, apresentado em aula e adaptado para resolver esse problema, adota essa metodologia.
 
 ### Q-Learning
 
-Em contraste, o *Q-learning* aprende diretamente o valor de tomar ação $a$ em um estado $s$, $Q(s, a)$. Com ele podemos encontrar política ótima $\pi^*$ durante jogo, dado o conhecimento acumulado do jogo.
+Em contraste, o *Q-learning* aprende diretamente o valor de tomar ação $a$ em um estado $s$, $Q(s, a)$. Por exemplo, com ele podemos encontrar política ótima $\pi^*$ durante um jogo, dado o conhecimento acumulado do jogo.
 
 A atualização da função $Q$ é feita pela seguinte equação:
 
-$$ Q(s, a) \leftarrow Q(s, a) + \alpha \left[ R + \gamma \max_{a'} Q(s', a') - Q(s, a) \right] $$
+$$ Q(s, a) \leftarrow Q(s, a) + \eta \left[ R + \gamma \max_{a'} Q(s', a') - Q(s, a) \right], $$
 
-Onde com $\max_{a'} Q(s', a')$ encontramos ação $a'$ que maximiza a função $Q$ depois de tomada ação $a$. É atualizado o valor da ação atual $(s, a)$ assumindo que a melhor ação possível será tomada no próximo estado $(s')$, independentemente da ação que a política de exploração realmente escolheu. Isso o torna um método off-policy, pois aprende sobre a política ótima (greedy) enquanto segue outra política (por exemplo, $\epsilon$-greedy)
+com $\eta$ sendo o *learning rate*.
+
+Onde com $\max_{a'} Q(s', a')$ encontramos ação $a'$ que maximiza a função $Q$ depois de tomada ação $a$. É atualizado o valor da ação atual $(s, a)$ assumindo que a melhor ação possível será tomada no próximo estado $(s')$, independentemente da ação que a política de exploração realmente escolheu. Isso o torna um método *off-policy*, pois aprende sobre a política ótima (*greedy*) enquanto segue outra política (por exemplo, $\epsilon$-*greedy*).
 
 ## Implementação
 
 O código implementado encontra-se disponível no arquivo `main.ipynb`. Acompanhando o código, estão alguns comentários para complementar e melhorar a legibilidade. 
 
-Fora criado uma classe para simular o ambiente e duas classes para simular jogador, uma destinada ao TD(0) e outra ao Q-Learning.
+Fora criada uma classe para simular o ambiente e duas classes para simular o agente, uma destinada ao TD(0) e outra ao Q-Learning.
 
 Buscando seguir uma estrutura parecida com a do exemplo do jogo da velha, foram definidas as classes (com apenas as descrições abaixo):
 
-- `Enviroment`: 
+- `Enviroment`: responsável por fornecer a lista de ações possíveis para cada estado e realizar as transições de estado seguindo o modelo descrito na [descrição do problema](#descrição-do-problema).
 
 ```
 class Environment:
@@ -80,15 +96,14 @@ class Environment:
 
 ```
 
-- `Agent` (caso TD(0)):
-Conta com um passo a mais com relação ao Q-Learning, que atualiza a policy após avaliar a nova função de $V(s)$.
+- `AgentTD`: implementa um agente que segue o método TD(0). Conta com um passo a mais com relação ao Q-Learning, que atualiza a policy após avaliar a nova função de $V(s)$.
 
 ```
 class AgentTD:
     """
     Agente que usa TD(0) para avaliação e melhora a política de forma explícita.
     """
-    def __init__(self, discount_factor, epsilon, learning_rate=LEARNING_RATE,):
+    def __init__(self, discount_factor, epsilon, learning_rate=LEARNING_RATE):
         ...
     def choose_action(self, state):
         """
@@ -116,7 +131,7 @@ class AgentTD:
 ```
 
 
-- `Agent` (caso Q-Learning):
+- `AgentQ`: implementa um agente que segue o método Q-Learning. O código é parecido com o do caso TD(0), mas sem o passo de atualizar separadamente a política.
 
 ```
 class AgentQ:
@@ -155,15 +170,15 @@ class AgentQ:
 ```
 
 
-..
+Em sendo um "jogo infinito", foram simuladas 1000 iterações por 100 épocas, para gerar os *rewards* e *heatmaps* como solicitado.
 
-Em sendo um jogo infinito, foram simulados 1000 iterações do jogo por 100 épocas, para gerar os rewards e heatmaps como solicitado.
+Funções auxiliares (para gerar imagens e treinar os modelos) também podem ser encontradas em `main.ipynb`. 
 
-Funções auxiliares (para gerar imagens e treinar os modelos) também ser encontrados em `main.ipynb`. 
+Além das classes e funções, foram definidas algumas variáveis globais, que foram mantidas fixas ao longo dos experimentos. Mais especificamente, essas variáveis descrevem $\alpha$, $\beta$, $r_{\textrm{search}}$, $r_{\textrm{wait}}$, $r_{\textrm{rescue}}$ e $r_{\textrm{charge}}$, além de parâmetros de implementação, como o *learning rate* e os números de épocas e de iterações. 
 
 ## Resultados e discussão
 
-Para explorar a influência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e rodamos os jogos com diferentes valores de $\epsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
+Para explorar a influência dos hiperparâmetros no aprendizado de cada método, fixamos valores das recompensas e rodamos os jogos com diferentes valores de $\varepsilon$ e $\gamma$. Também comparamos o efeito de tomar ou não políticas exploratórias durante o treinamento.
 
 
 
@@ -176,20 +191,23 @@ Primeiramente, utilizando o método TD(0), fixamos $\gamma = 0.9$ e tomamos $\va
 Em todos os cenários, a política ótima aprendida ao fim do treinamento opta por procurar sempre que a bateria está alta e recarregar sempre que a bateria está baixa, não havendo grande diferença entre os *heatmaps*. Entretanto, a evolução dos *rewards* ao longo das épocas apresenta diferenças. 
 
 <p float="left">
+  <img src="/figs/rewards_greddy_td0.png" width="400" />
+  <img src="/figs/heatmap_greedy_td0.png" width="400" />
+</p>
+
+<p float="left">
   <img src="/figs/rewards_epsilon0p1_td0.png" width="400" />
   <img src="/figs/heatmap_epsilon0p1_td0.png" width="400" />
 </p>
-
 
 <p float="left">
   <img src="/figs/rewards_epsilon0p5_td0.png" width="400" />
   <img src="/figs/heatmap_epsilon0p5_td0.png" width="400" />
 </p>
 
-<p float="left">
-  <img src="/figs/rewards_greddy_td0.png" width="400" />
-  <img src="/figs/heatmap_greedy_td0.png" width="400" />
-</p>
+Nas imagens acima, é possível notar que há maior oscilação quanto maior o valor de $\varepsilon$. Isso faz sentido, pois significa uma maior probabilidade de exploração, i.e., escolher políticas aleatoriamente. No primeiro cenário, com $\varepsilon = 0.0$, temos a adoção de um aprendizado *greedy*, e o *reward* se mostra muito mais estável.
+
+Ao adotar uma abordagem *greedy*, espera-se que o modelo rapidamente convirja para uma otimalidade local, frequentemente subótima. Isso não é observado aqui, provavelmente porque o problema é simples. A maior influência dos valores de $\epsilon$ é em diminuir o reward médio, uma vez que a policy estava saindo constantemente da otimal.
 
 <!-- ![FIGURA KAPUTT](figs/rewards_epsilon0p1_td0.png)
 
@@ -206,6 +224,14 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 
 - Q-Learning
 
+Utilizando o método Q-learning, fixamos $\gamma = 0.9$ e tomamos $\varepsilon \in \lbrace 0.0, \ 0.1, \ 0.5 \rbrace$.
+
+
+<p float="left">
+  <img src="/figs/rewards_greedy_q.png" width="400" />
+  <img src="/figs/heatmap_greedy_q.png" width="400" />
+</p>
+
 <p float="left">
   <img src="/figs/rewards_epsilon0p1_q.png" width="400" />
   <img src="/figs/heatmap_epsilon0p1_q.png" width="400" />
@@ -216,10 +242,10 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
   <img src="/figs/heatmap_epsilon0p5_q.png" width="400" />
 </p>
 
-<p float="left">
-  <img src="/figs/rewards_greedy_q.png" width="400" />
-  <img src="/figs/heatmap_greedy_q.png" width="400" />
-</p>
+Aqui o fenômeno de convergência subótima ocorre, com a policy greedy não explorando a ação de recarregar a bateria.
+
+Já com $\epsilon$ grande (0.5) o benefício marginal da exploração já se esvaiu, garantindo ao modelo função Q estável mas fazendo escolhas subótimas com grande frequência.
+
 
 <!-- ![FIGURA KAPUTT](figs/rewards_epsilon0p1_q.png)
 
@@ -246,6 +272,9 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 ### Explorando $\gamma$
 
 - TD(0)
+
+Utilizando o método TD(0), fixamos $\epsilon = 0.1$ e tomamos $\gamma \in \lbrace 0.5, \ 0.8, \ 0.99 \rbrace$.
+
 
 <p float="left">
   <img src="/figs/rewards_gamma0p5_td0.png" width="400" />
@@ -275,7 +304,12 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 
 ![FIGURA KAPUTT](figs/heatmap_gamma0p9_td0.png) -->
 
+Os rewards ficaram todos idênticos, evidenciando que a escolha de ações ao longo do aprendizado não é fortemente influenciada por $\gamma$. Isso deve se dar ao fato de o problema ser muito simples; de fato, o dual do grafo cujos vértices são os estados e as arestas são as ações - presente no livro - tem diâmetro 2, portanto é de se esperar que um parâmetro que regule o quanto ações de longo prazo influenciam a escolha de políticas tenha essa característica.
+
+
 - Q-Learning
+
+Utilizando o método Q-learning, fixamos $\epsilon = 0.1$ e tomamos $\gamma \in \lbrace 0.5, \ 0.8, \ 0.99 \rbrace$.
 
 <p float="left">
   <img src="/figs/rewards_gamma0p5_q.png" width="400" />
@@ -323,9 +357,13 @@ Em todos os cenários, a política ótima aprendida ao fim do treinamento opta p
 
 ![FIGURA KAPUTT](figs/heatmap_greedy_q.png)-->
 
+Nota-se que $\gamma$ pequeno traz prioridade para recompensas imediatas. Aumentando $\gamma$, percebemos mais preferência por recarregar, claramente uma estratégia a "longo prazo". Existe diluição geral do incentivo para procurar com $\gamma$ pequeno, como fica evidente com o heatmap.
+
+Quanto ao reward, para $\gamma$ próximo de 1, percebemos um *reward* médio maior, evidenciando que, nesse jogo, dar peso grande a ações a serem tomadas a longo prazo é benéfico para o reward.
+
 ## Conclusão
 
-[Resumir achados dos plots acima]
+A implementação dos algoritmos TD(0) e Q-Learning permitiu analisar como os hiperparâmetros $\epsilon$ e $\gamma$ afetam o aprendizado do robô de reciclagem. Constatou-se que a exploração é essencial para evitar políticas subótimas e que valores maiores de $\gamma$ favorecem estratégias de longo prazo, resultando em maior recompensa média.
 
 ---
 ## Referências
